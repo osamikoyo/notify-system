@@ -1,3 +1,5 @@
 package sender
 
-type Sender interface{}
+type Sender interface{
+	Send()
+}
