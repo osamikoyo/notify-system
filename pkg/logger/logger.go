@@ -2,49 +2,66 @@ package logger
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
+	"go.uber.org/zap/buffer"
+	"go.uber.org/zap/zapcore"
 )
 
-type Logger struct{
-	*logrus.Logger
+type Logger struct {
+	*zap.Logger
 }
 
-type CustomFormatter struct{}
+type CustomEncoder struct {
+	zapcore.Encoder
+}
 
-func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+func (e *CustomEncoder) EncodeEntry(entry zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
+	// Добавляем цвета для уровней логирования
 	var levelColor string
 	switch entry.Level {
-	case logrus.DebugLevel:
+	case zapcore.DebugLevel:
 		levelColor = "\033[36m" // Cyan
-	case logrus.InfoLevel:
+	case zapcore.InfoLevel:
 		levelColor = "\033[32m" // Green
-	case logrus.WarnLevel:
+	case zapcore.WarnLevel:
 		levelColor = "\033[33m" // Yellow
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+	case zapcore.ErrorLevel, zapcore.FatalLevel, zapcore.PanicLevel:
 		levelColor = "\033[31m" // Red
 	default:
 		levelColor = "\033[0m" // Reset
 	}
 
-	return []byte(fmt.Sprintf(
-		"%s[%s]%s \033[1m%s\033[0m \033[2m(%s:%d)\033[0m: %s\n",
+	// Форматируем строку лога
+	formatted := fmt.Sprintf(
+		"%s[%s]%s \033[1m%s\033[0m\033[0m: %s\n",
 		levelColor,
 		entry.Time.Format("2006-01-02 15:04:05"),
 		levelColor,
-		entry.Level.String(),
-		entry.Caller.File,
-		entry.Caller.Line,
+		entry.Level.CapitalString(),
 		entry.Message,
-	)), nil
+	)
+
+	buf := buffer.NewPool().Get()
+	buf.AppendString(formatted)
+	return buf, nil
 }
 
 func Init() *Logger {
-	logger := logrus.New()
+	// Настройка конфигурации zap
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 
-    logger.SetFormatter(&CustomFormatter{})
+	// Создаем кастомный энкодер
+	encoder := &CustomEncoder{
+		Encoder: zapcore.NewConsoleEncoder(config.EncoderConfig),
+	}
 
-    logger.SetReportCaller(true)
+	// Создаем логгер
+	core := zapcore.NewCore(encoder, zapcore.AddSync(zapcore.Lock(os.Stdout)), zapcore.DebugLevel)
+	logger := zap.New(core, zap.AddCaller())
 
 	return &Logger{logger}
 }
