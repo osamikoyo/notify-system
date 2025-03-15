@@ -1,5 +1,13 @@
 package config
 
+import (
+	"fmt"
+	"io"
+	"os"
+
+	"gopkg.in/yaml.v3"
+)
+
 type TgCfg struct{
 	Use bool `yaml:"use"`
 	ChatId int64 `yaml:"chat_id"`
@@ -25,4 +33,24 @@ type Config struct{
 	EmailCfg EmailCfg `yaml:"email"`
 	SmsCfg SmsCfg `yaml:"sms"`
 	TgCfg TgCfg `yaml:"tg"`
+}
+
+func Init() (*Config,error) {
+	file,err := os.Open("config.yaml")
+	if err != nil{
+		return nil, fmt.Errorf("cant open config file: %v",err)
+	}
+
+	body,err := io.ReadAll(file)
+	if err != nil{
+		return nil, fmt.Errorf("cant get body: %v", err)
+	}
+
+	var cfg Config
+
+	if err = yaml.Unmarshal(body, &cfg);err != nil{
+		return nil, fmt.Errorf("cant unmarshal: %v",err)
+	}
+
+	return &cfg, nil
 }
