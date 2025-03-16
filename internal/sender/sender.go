@@ -29,6 +29,6 @@ func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger) (*SenderMan
 		senders = append(senders, InitEmailSender(cfg, logger)) 
 	}
 	if cfg.SmsCfg.Use {
-		
+		senders = append(senders, InitSmsSender(cfg, logger))
 	}
 }
