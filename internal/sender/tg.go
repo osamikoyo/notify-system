@@ -1,7 +1,10 @@
 package sender
 
 import (
+	"context"
+
 	"github.com/koyo-os/notify-system/internal/config"
+	"github.com/koyo-os/notify-system/internal/models"
 	"github.com/koyo-os/notify-system/pkg/logger"
 	"github.com/nikoksr/notify"
 	"github.com/nikoksr/notify/service/telegram"
@@ -34,4 +37,12 @@ func InitTgsender(cfg *config.Config, logger *logger.Logger) *TgSender {
 		logger: logger,
 		cfg: cfg,
 	}
+}
+
+func (t *TgSender) Send(msg models.Notify, ctx context.Context) error {
+	return notify.Send(
+		ctx,
+		msg.Subject,
+		msg.Message,
+	)
 }

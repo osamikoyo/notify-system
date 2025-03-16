@@ -23,7 +23,7 @@ func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger) (*SenderMan
 	var senders []Sender
 
 	if cfg.TgCfg.Use {
-		
+		senders = append(senders, InitTgsender(cfg, logger))
 	}
 	if cfg.EmailCfg.Use {
 		senders = append(senders, InitEmailSender(cfg, logger)) 
