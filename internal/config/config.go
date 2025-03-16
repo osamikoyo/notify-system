@@ -29,6 +29,7 @@ type SmsCfg struct{
 }
 
 type Config struct{
+	Topic string `yaml:"topic_name"`
 	KafkaUrl string `yaml:"kafka_url"`
 	EmailCfg EmailCfg `yaml:"email"`
 	SmsCfg SmsCfg `yaml:"sms"`

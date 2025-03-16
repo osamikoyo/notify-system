@@ -12,7 +12,7 @@ import (
 type Comsumer struct{
 	MessageChan chan []byte
 	wg *sync.WaitGroup
-	client *sarama.Consumer
+	client *sarama.PartitionConsumer
 	logger *logger.Logger
 }
 
@@ -31,12 +31,31 @@ func Init(cfg *config.Config, ch chan []byte) (*Comsumer, error){
 		})
 	}
 
+	pititionClient,err := client.ConsumePartition(
+		cfg.Topic,
+		0,
+		sarama.OffsetOldest,
+	)
+
+	if err != nil{
+		logger.Error("cant get partition consumer: ", zapcore.Field{
+			Key: "err",
+			String: err.Error(),
+		})
+		
+		return nil, err
+	}
+
 	var wg sync.WaitGroup
 
 	return &Comsumer{
-		client: &client,
+		client: &pititionClient,
 		wg: &wg,
 		logger: logger,
 		MessageChan: ch,
 	}, nil
+}
+
+func (c *Comsumer) Listen() error {
+
 }
