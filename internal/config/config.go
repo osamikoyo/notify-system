@@ -25,6 +25,7 @@ type EmailCfg struct{
 
 type SmsCfg struct{
 	Use bool `yaml:"use"`
+	PrintResp bool `yaml:"print_resp"`
 	From string `yaml:"from"`
 }
 

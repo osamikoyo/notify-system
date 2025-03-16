@@ -18,6 +18,8 @@ type TgSender struct{
 }
 
 func InitTgsender(cfg *config.Config, logger *logger.Logger) *TgSender {
+	logger.Info("starting setup telegram notificationer")
+
 	service, err := telegram.New(cfg.TgCfg.Token)
 	if err != nil{
 		logger.Error("cant get telegramm sender", zapcore.Field{
@@ -40,6 +42,8 @@ func InitTgsender(cfg *config.Config, logger *logger.Logger) *TgSender {
 }
 
 func (t *TgSender) Send(msg models.Notify, ctx context.Context) error {
+	t.logger.Info("starting send telegram notify")
+
 	return notify.Send(
 		ctx,
 		msg.Subject,
