@@ -19,7 +19,7 @@ type SenderManager struct{
 	cfg *config.Config
 }
 
-func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger) (*SenderManager, error) {
+func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger) *SenderManager {
 	var senders []Sender
 
 	if cfg.TgCfg.Use {
@@ -30,5 +30,12 @@ func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger) (*SenderMan
 	}
 	if cfg.SmsCfg.Use {
 		senders = append(senders, InitSmsSender(cfg, logger))
+	}
+
+	return &SenderManager{
+		MessageChan: ch,
+		cfg: cfg,
+		logger: logger,
+		senders: senders,
 	}
 }
