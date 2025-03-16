@@ -5,4 +5,5 @@ type Notify struct{
 	Message string
 	From string
 	To string
+	Subject string
 }

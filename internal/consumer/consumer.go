@@ -12,7 +12,7 @@ import (
 type Comsumer struct{
 	MessageChan chan []byte
 	wg *sync.WaitGroup
-	client *sarama.PartitionConsumer
+	client sarama.PartitionConsumer
 	logger *logger.Logger
 }
 
@@ -49,13 +49,25 @@ func Init(cfg *config.Config, ch chan []byte) (*Comsumer, error){
 	var wg sync.WaitGroup
 
 	return &Comsumer{
-		client: &pititionClient,
+		client: pititionClient,
 		wg: &wg,
 		logger: logger,
 		MessageChan: ch,
 	}, nil
 }
 
-func (c *Comsumer) Listen() error {
+func (c *Comsumer) Listen() {
+	c.wg.Add(1)
 
+	c.logger.Info("starting kafka consumer...")
+
+	go func ()  {
+		defer c.wg.Done()
+
+		for msg := range c.client.Messages(){
+			c.MessageChan <- msg.Value
+		}
+	}()
+
+	c.wg.Wait()
 }
