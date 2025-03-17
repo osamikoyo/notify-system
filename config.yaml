@@ -1,0 +1,14 @@
+topic : notify
+kafka_url : localhost:9092
+
+email:
+  use : true
+  from : "example@corporatemail.ru"
+  host: smtp.gmail.com
+  port: 587
+  username : example@mail.ru
+  password : 123456
+sms:
+  use : false
+tg:
+  use : false

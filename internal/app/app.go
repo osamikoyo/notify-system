@@ -15,6 +15,10 @@ func App() error {
 	go func ()  {
 		counter++
 
+		if counter == -1{
+			return
+		}
+
 		time.Sleep(time.Second)
 	}()
 
@@ -32,5 +36,5 @@ func App() error {
 
 	logger.Info("start notify...")
 
-
+	logger.Info("getting config.yaml...")
 }
