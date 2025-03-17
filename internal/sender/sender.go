@@ -47,6 +47,8 @@ func Init(cfg *config.Config, ch chan []byte, logger *logger.Logger, wg *sync.Wa
 }
 
 func (s *SenderManager) Listen() {
+	s.logger.Info("sender manager listen...")
+
 	for {
 		msg := <- s.MessageChan
 		
